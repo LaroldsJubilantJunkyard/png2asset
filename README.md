@@ -1,76 +1,53 @@
-# GBDK-2020
-GBDK is a cross-platform development kit for sm83 and z80 based gaming consoles. It includes libraries, toolchain utilities and the [SDCC](http://sdcc.sourceforge.net/) C compiler suite.
+# png2asset
+A tool that converts png to maps or meta sprites in C for gbdk 2020
 
-__Supported Consoles:__ [(see docs)](https://gbdk-2020.github.io/gbdk-2020/docs/api/docs_supported_consoles.html)
-- Nintendo Gameboy / Game Boy Color
-- Analogue Pocket
-- Sega Master System & Game Gear
-- Mega Duck / Cougar Boy
+### Working with png2asset
+  - The origin (pivot) for the metasprite is not required to be in the upper left-hand corner as with regular hardware sprites. See `-px` and `-py`.
 
+  - The conversion process supports using both SPRITES_8x8 (`-spr8x8`) and SPRITES_8x16 mode (`-spr8x16`). If 8x16 mode is used then the height of the metasprite must be a multiple of 16.
 
-## Current Release
-<a href="https://github.com/gbdk-2020/gbdk-2020/releases/latest/download/gbdk-win.zip"><img src="https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="GBDK-2020 Windows Release"></a> 
-<a href="https://github.com/gbdk-2020/gbdk-2020/releases/latest/download/gbdk-linux64.tar.gz"><img src="https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black" alt="GBDK-2020 Linux Release"></a>
-<a href="https://github.com/gbdk-2020/gbdk-2020/releases/latest/download/gbdk-macos.zip"><img src="https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=apple&logoColor=white" alt="GBDK-2020 MacOS Release"></a>
+#### Terminology
+The following abbreviations are used in this section:
+* Original Game Boy and Game Boy Pocket style hardware: `DMG`
+* Game Boy Color: `CGB`
 
-<!-- <a href="https://hub.docker.com"><img src="https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white" alt="Docker"></a> -->
+#### Conversion Process
+png2asset accepts any png as input, although that does not mean any image will be valid. The program will follow the next steps:
+  - The image will be subdivided into tiles of 8x8 or 8x16
+  - For each tile a palette will be generated
+  - If there are more than 4 colors in the palette it will throw an error
+  - The palette will be sorted from darkest to lightest. If there is a transparent color that will be the first one (this will create a palette that will also work with `DMG` devices)
+  - If there are more than 8 palettes the program will throw an error
 
-Upgrading to a new version? Check the [Migration notes](https://gbdk-2020.github.io/gbdk-2020/docs/api/docs_migrating_versions.html). You can find older versions [here](https://github.com/gbdk-2020/gbdk-2020/releases).
+With all this, the program will generate a new indexed image (with palette), where each 4 colors define a palette and all colors within a tile can only have colors from one of these palettes
 
-For a full list of changes see the [ChangeLog](https://github.com/gbdk-2020/gbdk-2020/blob/master/docs/ChangeLog) file or [online Docs](https://gbdk-2020.github.io/gbdk-2020/docs/api/docs_releases.html).
+It is also posible to pass an indexed 8-bit png with the palette properly sorted out, using `-keep_palette_order`
+  - Palettes will be extracted from the image palette in groups of 4 colors.
+  - Each tile can only have colors from one of these palettes per tile
+  - The maximum number of colors is 32
 
+Using this image a tileset will be created
+  - Duplicated tiles will be removed
+  - Tiles will be matched without mirror, using vertical mirror, horizontal mirror or both (use `-noflip` to turn off matching mirrored tiles)
+  - The palette won't be taken into account for matching, only the pixel color order, meaning there will be a match between tiles using different palettes but looking identical on grayscale
 
-## Build status
-[![GBDK Build and Package](https://github.com/gbdk-2020/gbdk-2020/actions/workflows/gbdk_build_and_package.yml/badge.svg?branch=develop)](https://github.com/gbdk-2020/gbdk-2020/actions/workflows/gbdk_build_and_package.yml)
+#### Maps
+Passing `-map` the png can be converted to a map that can be used in both the background and the window. In this case, png2asset will generate:
+  - The palettes
+  - The tileset
+  - The map
+  - The color info
+    - By default, an array of palette index for each tile. This is not the way the hardware works but it takes less space and will create maps compatibles with both `DMG` and `CGB` devices.
+    - Passing `-use_map_attributes` will create an array of map attributes. It will also add mirroring info for each tile and because of that maps created with this won't be compatible with.
+      - Use `-noflip` to make background maps which are compatible with `DMG` devices.
 
-
-## Docs
-GBDK includes extensive [documentation](https://gbdk-2020.github.io/gbdk-2020/docs/api). A good place to begin is the [Getting Started Section](https://gbdk-2020.github.io/gbdk-2020/docs/api/docs_getting_started.html).
-
-Check the [Links and Third-Party Tools Section](https://gbdk-2020.github.io/gbdk-2020/docs/api/docs_links_and_tools.html) for a list of recommended emulators, graphics tools, music drivers and more.
-
-For SDCC you can check its [website](http://sdcc.sourceforge.net/) and the [manual](http://sdcc.sourceforge.net/doc/sdccman.pdf)
-
-
-## Usage
-Most users will only need to download and unzip the latest [release](https://github.com/gbdk-2020/gbdk-2020/releases)
-
-Then go to the examples folder and build them (with `compile.bat` on Windows or running `make`). They are a good starting point.
-
-The sources in this repo are only needed if you want to re-compile GBDK-2020 yourself instead of using the release binaries linked above.
-
-
-## Discord servers
-* [gbdk/zgb Discord](https://discord.gg/XCbjCvqnUY) - For help with using GBDK (and ZGB), discussion and development of gbdk-2020
-
-* [gbdev Discord](https://discordapp.com/invite/tKGMPNr) - There is a #gbdk channel and also people with a lot of Game Boy development knowledge
-* [SMS Power! Discord](https://discord.gg/h5xrKUK) - Additional SMS & Game Gear discussion and resources.
-
-## Forums
-- [The Game Boy Development Forum](https://gbdev.gg8.se/forums/) - A good place to search for Game Boy related answers. 
-- [SMS Power! Forum](https://www.smspower.org/) - Additional SMS & Game Gear discussion and resources.
-
-
-## Current status
-- Updated CRT and library that suits better for game development
-- SDCC Versions
-  - Current GBDK-2020 versions require SDCC patches for z80 SMS/Game Gear support. So SDCC nightlies/snapshot builds cannot be used if you want to target SMS/Game Gear. Instead use the [Patched SDCC Builds](https://github.com/gbdk-2020/gbdk-2020-sdcc/releases/tag/sdcc-12539-patched). 
-  - In addition, recent SDCC nightlies/snapshot builds have switched to a new calling convention which is not well tested with GBDK-2020 and there may be bugs. It's recommended to not use versions after build #12539 at this time.
-- The compiler driver **lcc** supports the latest sdcc toolchain.
+#### Meta sprites
+By default the png will be converted to metasprites. The image will be subdivided into meta sprites of `-sw` x `-sh`. In this case png2asset will generate:
+  - The metasprites, containing an array of:
+    - tile index
+    - y offset
+    - x offset
+    - flags, containing the mirror info, the palettes for both DMG and GBC and the sprite priority
+  - The metasprites array
 
 
-## Origin
-Over the years people have been complaining about all the GBDK issues caused by a very old version of SDCC (the compiler). This is a proper attempt of updating it while also keeping all the old functionallity working, like support for banked code and data and so on.
-
-The last version in the OLD repo is [2.96](https://sourceforge.net/projects/gbdk/files/gbdk/2.96/) although releases are available until 2.95-3. Version [2.96](https://sourceforge.net/projects/gbdk/files/gbdk/2.96/) is the starting point of this repo.
-
-
-# Build instructions
-Unless you are interested on recompiling the sources for some reason (like fixing some bugs) **you don't need to build GBDK**
-
-- **Windows only**: Download and install [mingw](http://mingw-w64.org/)
-- Clone, download this repo or just get the source form the [releases](https://github.com/gbdk-2020/gbdk-2020/releases)
-- Download and install the **PATCHED** [sdcc builds](https://github.com/gbdk-2020/gbdk-2020-sdcc/releases/tag/sdcc-12539-patched) from the separate repo for that (https://github.com/gbdk-2020/gbdk-2020-sdcc/releases/tag/sdcc-12539-patched).
-- On Linux **don't use package managers** The latest release available won't work, you need to compile or download one of the nightlies
-- Create **SDCCDIR** environment variable, that points into the folder, where you installed sdcc
-- Open command prompt or a terminal, go to the root directory of the repo and run **make**
