@@ -10,14 +10,14 @@
 #define World1Area1_TILE_H 8
 #define World1Area1_WIDTH 2040
 #define World1Area1_HEIGHT 144
-#define World1Area1_TILE_COUNT 9
+#define World1Area1_TILE_COUNT 10
 #define World1Area1_MAP_ATTRIBUTES World1Area1_map_attributes
 #define World1Area1_TILE_PALS 0
 
 BANKREF_EXTERN(World1Area1)
 
 extern const palette_color_t World1Area1_palettes[4];
-extern const uint8_t World1Area1_tiles[144];
+extern const uint8_t World1Area1_tiles[160];
 
 extern const unsigned char World1Area1_map[4617];
 extern const unsigned char World1Area1_map_attributes[4617];
