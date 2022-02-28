@@ -929,6 +929,7 @@ int main(int argc, char *argv[])
 		fprintf(file, "#define %s_WIDTH %d\n",  data_name.c_str(), sprite_w);
 		fprintf(file, "#define %s_HEIGHT %d\n", data_name.c_str(), sprite_h);
 		fprintf(file, "#define %s_TILE_COUNT %d\n", data_name.c_str(), ((unsigned int)tiles.size()- source_tileset_size) * (tile_h >> 3));
+		fprintf(file, "#define %s_PALETTE_COUNT %d\n", data_name.c_str(), image.palettesize/4);
 
 		if (includedMapOrMetaspriteData) {
 

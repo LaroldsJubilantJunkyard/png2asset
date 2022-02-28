@@ -11,6 +11,7 @@
 #define World1Area1_WIDTH 2040
 #define World1Area1_HEIGHT 144
 #define World1Area1_TILE_COUNT 10
+#define World1Area1_PALETTE_COUNT 2
 #define World1Area1_MAP_ATTRIBUTES World1Area1_map_attributes
 #define World1Area1_TILE_PALS 0
 
