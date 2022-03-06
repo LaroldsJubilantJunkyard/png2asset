@@ -1250,7 +1250,9 @@ int main(int argc, char* argv[])
 			vector< unsigned char > packed_data = (*it).GetPackedData(pack_mode);
 			for (vector< unsigned char >::iterator it2 = packed_data.begin(); it2 != packed_data.end(); ++it2)
 			{
-				tilesBinaryFile.write((const char*)&it2, 1);
+
+				const char chars[] = { *it2 };
+				tilesBinaryFile.write(chars, 1);
 			}
 
 		}
@@ -1274,9 +1276,14 @@ int main(int argc, char* argv[])
 
 					int tile = column + row * columns;
 
+					const char mapChars[] = { map[tile] };
+
 					// Write map items column-by-column
-					mapBinaryFile.write((const char*)&map[tile], 1);
-					if (use_map_attributes)mapAttributesBinaryfile.write((const char*)&map_attributes[tile], 1);
+					mapBinaryFile.write(mapChars, 1);
+					if(use_map_attributes) {
+						const char mapAttributeChars[] = { map_attributes[tile] };
+						mapAttributesBinaryfile.write(mapAttributeChars, 1);
+					}
 				}
 			}
 		}
